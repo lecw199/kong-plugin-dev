@@ -1,0 +1,45 @@
+cassandra:
+  image: cassandra:3.9
+  container_name: kong-tests-cassandra
+  ports:
+    - "9042:9042"
+
+postgres:
+  build: ./postgres
+  container_name: kong-tests-postgres
+  command: postgres -c "config_file=/etc/postgresql/postgresql.conf"
+  volumes:
+    - "$PWD/postgres/postgres.conf:/etc/postgresql/postgresql.conf"
+  ports:
+    - "5432:5432"
+  environment:
+    - "POSTGRES_USER=kong"
+#    - "POSTGRES_PASSWORD=postgres"
+#    - "POSTGRES_HOST_AUTH_METHOD=trust"
+
+redis:
+  image: redis
+  container_name: kong-tests-redis
+  ports:
+    - "6379:6379"
+
+# grpc server
+grpcbin:
+  image: moul/grpcbin
+  container_name: grpcin
+  ports:
+    - "15002:9000"
+    - "15003:9001"
+
+# kong web
+kong-dashboard:
+  image: pantsel/konga:latest
+  container_name: kong-dashboard
+  environment:
+    - NODE_ENV=development
+    - DB_ADAPTER=postgres
+    - DB_HOST=kong-database
+    - DB_USER=kong
+    - DB_DATABASE=kong
+  ports:
+    - "1337:1337"
