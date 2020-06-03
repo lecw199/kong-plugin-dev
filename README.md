@@ -26,20 +26,21 @@ sh setup_env.sh
 ```
 
 可以仔细阅读下setup_env.sh脚本，看看这个脚本做了什么？
-1、安装openresty
-2、配置openresty环境变量
-3、安装go pluginsever
-4、安装Test::Nginx -- nginx测试组件
-5、docker启动 grpcbin 这个是grpc server， 当前bin目录下的grpcurl是client，用于测试kong grpc服务
+*   安装openresty   
+*   配置openresty环境变量   
+*   安装go pluginsever（不需要已经被注释）   
+*   安装Test::Nginx -- nginx测试组件（不需要已经被注释）   
+*   docker启动 grpcbin 这个是grpc server， 当前bin目录下的grpcurl是client，用于测试kong grpc服务（已经移动到docker_server目录中）
 
 
-执行make dev命令，帮助你安装所有的lua包
+安装好openresty之后，执行make dev命令，帮助你安装所有的lua包
 ```
 make dev
 ```
 
 **注意**：
 *   如果上面的setup_env.sh执行失败，可以参考直接参当前目录下的DEVELOPER.MD文件配置openresty；
+*   mac 安装openresty可以用brew命令，注意是否与kong的版本相匹配，同样其他系统也可以用对应的安装工具安装openresty；
 *   最好环境变量写入到.bashrc(linux) .bash_profile(mac)文件中
 
 
@@ -78,4 +79,4 @@ luarocks path
 
 
 
-以上步骤配置好后，代码已经可以跳转了，可以看看其他插件的源码学习下了
+以上完成后，代码已经可以跳转了（注意：c语言实现的库无法跳转），可以看看其他插件的源码学习下了
