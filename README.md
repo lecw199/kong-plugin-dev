@@ -1,7 +1,7 @@
 # kong-plugin-dev
 
 
-本项目主要是帮助大家快速入门kong插件的开发，并且集成到kong的测试环境，理解kong是如何测试插件，同时大家也可以快速了解lua及openresty的开发；
+本项目主要是帮助大家快速入门kong插件的开发，并且集成到kong的测试环境，理解kong是如何测试插件，同时大家也可以快速了解lua及openresty的开发；   
 说明： 文件内容来自kong源码，可以通以下命令克隆
 ```
 git clone git@github.com:Kong/kong.git
@@ -80,3 +80,4 @@ luarocks path
 
 
 以上完成后，代码已经可以跳转了（注意：c语言实现的库无法跳转），可以看看其他插件的源码学习下了
+
