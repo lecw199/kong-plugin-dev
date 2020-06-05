@@ -1,4 +1,5 @@
 local helpers    = require "spec.helpers"
+local cjson    = require "cjson"
 
 
 local HELLOWORLD = "HelloWorld"               -- just a test value
@@ -119,6 +120,9 @@ for _, strategy in helpers.each_strategy() do
         },
       })
       assert.response(res).has.status(403)
+      local body = cjson.decode(assert.res_status(403, res))
+      helpers.pprint(body)
+      print("----------------------------------------")
 
       local res = assert( proxy_client:send {
         method  = "GET",

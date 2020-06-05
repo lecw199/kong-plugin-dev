@@ -35,34 +35,34 @@ KONG_VERSION ?= `cat $(KONG_SOURCE_LOCATION)/kong-*.rockspec | grep tag | awk '{
 OPENRESTY_PATCHES_BRANCH ?= master
 KONG_NGINX_MODULE_BRANCH ?= master
 
-setup-ci:
-	OPENRESTY=$(RESTY_VERSION) \
-	LUAROCKS=$(RESTY_LUAROCKS_VERSION) \
-	OPENSSL=$(RESTY_OPENSSL_VERSION) \
-	OPENRESTY_PATCHES_BRANCH=$(OPENRESTY_PATCHES_BRANCH) \
-	KONG_NGINX_MODULE_BRANCH=$(KONG_NGINX_MODULE_BRANCH) \
-	.ci/setup_env.sh
+#setup-ci:
+#	OPENRESTY=$(RESTY_VERSION) \
+#	LUAROCKS=$(RESTY_LUAROCKS_VERSION) \
+#	OPENSSL=$(RESTY_OPENSSL_VERSION) \
+#	OPENRESTY_PATCHES_BRANCH=$(OPENRESTY_PATCHES_BRANCH) \
+#	KONG_NGINX_MODULE_BRANCH=$(KONG_NGINX_MODULE_BRANCH) \
+#	.ci/setup_env.sh
 
-setup-kong-build-tools:
-	-rm -rf $(KONG_BUILD_TOOLS_LOCATION)
-	-git clone https://github.com/Kong/kong-build-tools.git $(KONG_BUILD_TOOLS_LOCATION)
-	cd $(KONG_BUILD_TOOLS_LOCATION); \
-	git reset --hard $(KONG_BUILD_TOOLS); \
+#setup-kong-build-tools:
+#	-rm -rf $(KONG_BUILD_TOOLS_LOCATION)
+#	-git clone https://github.com/Kong/kong-build-tools.git $(KONG_BUILD_TOOLS_LOCATION)
+#	cd $(KONG_BUILD_TOOLS_LOCATION); \
+#	git reset --hard $(KONG_BUILD_TOOLS); \
+#
+#functional-tests: setup-kong-build-tools
+#	cd $(KONG_BUILD_TOOLS_LOCATION); \
+#	$(MAKE) setup-build && \
+#	$(MAKE) build-kong && \
+#	$(MAKE) test
 
-functional-tests: setup-kong-build-tools
-	cd $(KONG_BUILD_TOOLS_LOCATION); \
-	$(MAKE) setup-build && \
-	$(MAKE) build-kong && \
-	$(MAKE) test
-
-nightly-release:
-	sed -i -e '/return string\.format/,/\"\")/c\return "$(KONG_VERSION)\"' kong/meta.lua
-	$(MAKE) release
-
-release:
-	cd $(KONG_BUILD_TOOLS_LOCATION); \
-	$(MAKE) package-kong && \
-	$(MAKE) release-kong
+#nightly-release:
+#	sed -i -e '/return string\.format/,/\"\")/c\return "$(KONG_VERSION)\"' kong/meta.lua
+#	$(MAKE) release
+#
+#release:
+#	cd $(KONG_BUILD_TOOLS_LOCATION); \
+#	$(MAKE) package-kong && \
+#	$(MAKE) release-kong
 
 install:
 	@luarocks make OPENSSL_DIR=$(OPENSSL_DIR) CRYPTO_DIR=$(OPENSSL_DIR)
@@ -80,12 +80,12 @@ dependencies:
 	  fi \
 	done;
 
-grpcurl:
-	@curl -s -S -L \
-		https://github.com/fullstorydev/grpcurl/releases/download/v1.3.0/grpcurl_1.3.0_$(GRPCURL_OS)_$(MACHINE).tar.gz | tar xz -C bin;
-	@rm bin/LICENSE
+#grpcurl:
+#	@curl -s -S -L \
+#		https://github.com/fullstorydev/grpcurl/releases/download/v1.3.0/grpcurl_1.3.0_$(GRPCURL_OS)_$(MACHINE).tar.gz | tar xz -C bin;
+#	@rm bin/LICENSE
 
-dev: remove install dependencies grpcurl
+dev: remove install dependencies
 
 lint:
 	@luacheck -q .

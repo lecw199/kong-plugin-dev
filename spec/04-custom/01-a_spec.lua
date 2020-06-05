@@ -11,9 +11,6 @@ describe("should be awesome", function()
 
     -- or check by reference!
     assert.are_not.equal({ table = "great"}, { table = "great"})
-    log(ngx.ERR, "---", "----")
-
-    assert.True(1 < 2)
     assert.falsy(nil)
     assert.has.error(function() error("Wat") end, "Wat")
   end)

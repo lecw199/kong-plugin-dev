@@ -871,7 +871,7 @@ local function grpc_client(host, port, opts)
 
       local opts = gen_grpcurl_opts(pl_tablex.merge(t.opts, args.opts, true))
       ngx.log(ngx.ERR, string.format(t.cmd_template, opts, service))
-      ngx.sleep(5*60)
+      --ngx.sleep(5*60)
       local ok, err, out = exec(string.format(t.cmd_template, opts, service))
 
       if ok then
@@ -2469,6 +2469,41 @@ local function restart_kong(env, tables, fixtures)
   return start_kong(env, tables, true, fixtures)
 end
 
+local function pprint( t )
+  local print_r_cache={}
+  local function sub_print_r(t,indent)
+    if (print_r_cache[tostring(t)]) then
+      print(indent.."*"..tostring(t))
+    else
+      print_r_cache[tostring(t)]=true
+      if (type(t)=="table") then
+        for pos,val in pairs(t) do
+          if (type(val)=="table") then
+            print(indent.."["..pos.."] => "..tostring(t).." {")
+            sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+            print(indent..string.rep(" ",string.len(pos)+6).."}")
+          elseif (type(val)=="string") then
+            print(indent.."["..pos..'] => "'..val..'"')
+          else
+            print(indent.."["..pos.."] => "..tostring(val))
+          end
+        end
+      else
+        print(indent..tostring(t))
+      end
+    end
+  end
+  if (type(t)=="table") then
+    print(tostring(t).." {")
+    sub_print_r(t,"  ")
+    print("}")
+  else
+    sub_print_r(t,"  ")
+  end
+  print()
+end
+
+
 
 ----------------
 -- Variables/constants
@@ -2585,6 +2620,7 @@ end
   start_kong = start_kong,
   stop_kong = stop_kong,
   restart_kong = restart_kong,
+  pprint = pprint,
 
   -- Only use in CLI tests from spec/02-integration/01-cmd
   kill_all = function(prefix, timeout)

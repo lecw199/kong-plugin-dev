@@ -19,27 +19,17 @@ git clone git@github.com:Kong/kong.git
 git clone git@github.com:lecw199/kong-plugin-dev.git 
 ```
 
-执行环境安装
-```
-cd  kong-plugin-dev/.ci
-sh setup_env.sh
-```
+为何不用brew安装openresty？ 因为它还在使用--openssl 1.1.1f， 这个版本的openssl有高危漏洞
+brew install  kong/kong/openresty@1.15.8.3
+./kong-ngx-build --prefix /usr/local/Cellar/openresty@1.15.8.3/1.15.8.3 --openresty 1.15.8.3 --openssl 1.1.1f --luarocks 3.3.1 -j 12
 
-可以仔细阅读下setup_env.sh脚本，看看这个脚本做了什么？
-*   安装openresty   
-*   配置openresty环境变量   
-*   安装go pluginsever（不需要已经被注释）   
-*   安装Test::Nginx -- nginx测试组件（不需要已经被注释）   
-*   docker启动 grpcbin 这个是grpc server， 当前bin目录下的grpcurl是client，用于测试kong grpc服务（已经移动到docker_server目录中）
-
-
+建议参考直接参当前目录下的DEVELOPER.MD文件配置openresty；
 安装好openresty之后，执行make dev命令，帮助你安装所有的lua包
 ```
 make dev
 ```
 
 **注意**：
-*   如果上面的setup_env.sh执行失败，可以参考直接参当前目录下的DEVELOPER.MD文件配置openresty；
 *   mac 安装openresty可以用brew命令，注意是否与kong的版本相匹配，同样其他系统也可以用对应的安装工具安装openresty；
 *   最好环境变量写入到.bashrc(linux) .bash_profile(mac)文件中
 
@@ -81,3 +71,40 @@ luarocks path
 
 以上完成后，代码已经可以跳转了（注意：c语言实现的库无法跳转），可以看看其他插件的源码学习下了
 
+
+
+写个hello-world，练下lua语法，Program配置为openresty目录的luajit路径， 点击run跑起来
+
+![image-20200605171927857](md_picture/image-20200605172012149.png)
+
+
+## 二、测试
+kong测试是基于busted的，所以需要了解下这个测试，写插件时可以仿造其他插件 ，一般可以到luarocks源码包里看，   
+luarocks/share/lua/5.1/kong，如果你配置好了SDK，可以在IDE的External Libraries的目录下找到kong源码
+
+测试代码还是保存在spec目录，当然可以尽情的抄袭这些测试代码！
+### 2.1 单元测试
+
+启动测试
+```
+make test-self file=spec/01-unit/020-hello_word_spec.lua
+```
+
+### 2.2 plugin测试
+做插件测试时， kong的测试fixture会帮我们启动一个kong， 查看helpers.lua代码；   
+在测试代码中，启动kong时，一定要配置plugins和lua_package_path,不然无法启动自己编写的插件
+
+```
+assert(helpers.start_kong({
+        database   = strategy,
+        plugins = "hello-world",  -- 启用插件
+        lua_package_path = "./kong/plugins/hello-world/?.lua", -- 配置插件路径
+        nginx_conf = "spec/fixtures/custom_nginx.template",
+      }))
+
+```
+
+启动测试
+```
+make test-self file=spec/03-plugins/26-helloworld/01-hello_spec.lua
+```

@@ -5,7 +5,7 @@ cassandra:
     - "9042:9042"
 
 postgres:
-  build: ./postgres
+  image: postgres:self
   container_name: kong-tests-postgres
   command: postgres -c "config_file=/etc/postgresql/postgresql.conf"
   volumes:

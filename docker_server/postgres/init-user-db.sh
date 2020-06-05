@@ -3,8 +3,7 @@ set -e
 
 # PG_PASSWORD=postgres
 # CREATE user kong;
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-    CREATE DATABASE kong;
+psql -v ON_ERROR_STOP=1 --username "kong" <<-EOSQL
     CREATE DATABASE kong_tests;
     GRANT ALL PRIVILEGES ON DATABASE kong TO kong;
     GRANT ALL PRIVILEGES ON DATABASE kong_tests TO kong;

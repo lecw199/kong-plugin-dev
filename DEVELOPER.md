@@ -1,49 +1,4 @@
 
-These are the steps we follow at Kong to set up a development environment.
-
-
-## Virtual Machine
-
-Final deployments are typically on a Linux machine or container, so even if all components are multiplatform, it's easier to use it for development too.  If you use MacOS or Windows machines, setting a virtual machine is easy enough now.  Most of us use the freely available VirtualBox without any trouble.
-
-If you use Linux for your desktop, you can skip this section.
-
-There are no "hard" requirements on any Linux distro, but RHEL and CentOS can be more of a challenge to get recent versions of many packages; Fedora, Debian or Ubuntu are easier for this.
-
-To avoid long compilation times, give the VM plenty of RAM (8GB recommended) and all the CPU cores you can.
-
-### Virtual Box setup
-
-You will need to setup port forwarding on VirtualBox to be able to ssh into the box which can be done as follows:
-
-1. Select the virtual machine you want to use and click "Settings"
-1. Click "Network" tab
-1. Click "Advanced" dropdown
-1. Click "Port Forwarding"
-1. Add a new rule in the popup. The only thing you will need is "Host Port" to be 22222 and "Guest Port" to be 22. Everything else can be left default (see screenshot below)
-1. Click "Ok"
-
-Now you should be able to ssh <your_name>@127.1 -p 22222 to get SSH prompt. However, this requires us to type a long command and password every time we sign in. It is recommended you setup a public key and SSH alias to make this process simpler:
-
-1. On your host machine, generate a keypair for SSH into the guest: `ssh-keygen -t ed25519`.
-Just keep hitting Enter until the key is generated. You do not need a password for this key file since it is only used for SSH into your guest
-1. Type `cat .ssh/id_ed25519.pub` and copy the public key
-1. SSH into the guest using the command above
-1. Create the ssh config directory (if it doesn't exist) `$ mkdir -p .ssh`
-1. Edit the authorized keys list: `vim .ssh/authorized_keys`
-1. Paste in the content of .ssh/id_ed25519.pub
-1. Adjust the required privileges: `chmod 700 .ssh/`  and `chmod 400 .ssh/authorized_keys`
-1. Logout of guest and make sure you are not promoted password when SSH again
-1. Edit the .ssh/config file on your host and put in the following content:
-
-```
-    Host dev
-        HostName 127.1
-        Port 22222
-        User <your_user_name>
-```
-
-Now try ssh dev on your host, you should be able to get into the guest directly
 
 ## Linux Environment
 
@@ -119,6 +74,8 @@ These commands don't have to be performed as root, since all compilation is done
 
 After this task, we'd like to have the next steps use the built packages and for LuaRocks to install new packages inside this `build` directory.  For that, it's important to set the `$PATH` variable accordingly:
 
+
+## 将以下环境变量放入 .bash_profile中，注意更改安装路径, 然后 source  ~/.bash_profile
 ```
     export PATH=$HOME/path/to/kong/openresty-build-tools/build/openresty/bin:$HOME/path/to/kong/openresty-build-tools/build/openresty/nginx/sbin:$HOME/path/to/kong/openresty-build-tools/build/luarocks/bin:$PATH
     export OPENSSL_DIR=$HOME/path/to/kong/openresty-build-tools/build/openssl

@@ -275,6 +275,8 @@ for _, strategy in helpers.each_strategy() do
             assert.equal(true, reset <= 60 and reset >= 0)
           end
 
+          nginx.sleep(3*60)
+
           -- Additonal request, while limit is 6/minute
           local res, body = GET("/status/200", {
             headers = { Host = "test1.com" },
