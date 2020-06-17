@@ -1,7 +1,7 @@
 OS := $(shell uname | awk '{print tolower($$0)}')
 MACHINE := $(shell uname -m)
 
-DEV_ROCKS = "busted 2.0.0" "busted-htest 1.0.0" "luacheck 0.23.0" "lua-llthreads2 0.1.5" "http 0.3"
+DEV_ROCKS = "busted 2.0.0" "busted-htest 1.0.0" "luacheck 0.23.0" "lua-llthreads2 0.1.5" "http 0.3" "kong"
 WIN_SCRIPTS = "bin/busted" "bin/kong"
 BUSTED_ARGS ?= -v -o TAP
 TEST_CMD ?= bin/busted $(BUSTED_ARGS)
@@ -110,19 +110,7 @@ test-custom:
 test-self:
 	@$(TEST_CMD) $(file)
 
-pdk-phase-checks:
-	rm -f t/phase_checks.stats
-	rm -f t/phase_checks.report
-	PDK_PHASE_CHECKS_LUACOV=1 prove -I. t/01*/*/00-phase*.t
-	luacov -c t/phase_checks.luacov
-	grep "ngx\\." t/phase_checks.report
-	grep "check_" t/phase_checks.report
 
-fix-windows:
-	@for script in $(WIN_SCRIPTS) ; do \
-	  echo Converting Windows file $$script ; \
-	  mv $$script $$script.win ; \
-	  tr -d '\015' <$$script.win >$$script ; \
-	  rm $$script.win ; \
-	  chmod 0755 $$script ; \
-	done;
+install-openresty:
+	chmod +x script/openresty_deploy.sh
+	sh script/openresty_deploy.sh
