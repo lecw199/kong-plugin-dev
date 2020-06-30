@@ -5,6 +5,7 @@ DEV_ROCKS = "busted 2.0.0" "busted-htest 1.0.0" "luacheck 0.23.0" "lua-llthreads
 WIN_SCRIPTS = "bin/busted" "bin/kong"
 BUSTED_ARGS ?= -v -o TAP
 TEST_CMD ?= bin/busted $(BUSTED_ARGS)
+SHELL_BASH ?= /bin/bash -c
 
 ## -o TAP
 
@@ -110,7 +111,13 @@ test-custom:
 test-self:
 	@$(TEST_CMD) $(file)
 
+test-transform:
+	@$(TEST_CMD) spec/02-plugins/28-klook_request_transformer/02-access_spec.lua
 
 install-openresty:
 	chmod +x script/openresty_deploy.sh
 	sh script/openresty_deploy.sh
+
+clear:
+	@$(SHELL_BASH) 'echo -e "\033[32m -- clear logs complete. -- \033[0m"'
+	@$(SHELL_BASH) 'echo "" > logs/error.log && echo "" > logs/access.log'

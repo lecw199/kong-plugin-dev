@@ -1,45 +1,97 @@
-cassandra:
-  image: cassandra:3.9
-  container_name: kong-tests-cassandra
-  ports:
-    - "9042:9042"
+#
+# This file is a base for all environments
+#
+#
+##############################################################################
 
-postgres:
-  image: postgres:self
-  container_name: kong-tests-postgres
-  command: postgres -c "config_file=/etc/postgresql/postgresql.conf"
-  volumes:
-    - "$PWD/postgres/postgres.conf:/etc/postgresql/postgresql.conf"
-  ports:
-    - "5432:5432"
-  environment:
-    - "POSTGRES_USER=kong"
-#    - "POSTGRES_PASSWORD=postgres"
-    - "POSTGRES_HOST_AUTH_METHOD=trust"
+version: '3.3'
 
-redis:
-  image: redis
-  container_name: kong-tests-redis
-  ports:
-    - "6379:6379"
+services:
 
-# grpc server
-grpcbin:
-  image: moul/grpcbin
-  container_name: grpcin
-  ports:
-    - "15002:9000"
-    - "15003:9001"
+  cassandra:
+    image: cassandra:3.9
+    container_name: kong-tests-cassandra
+    ports:
+      - "9042:9042"
+    networks:
+      - kong-net
 
-# kong web
-kong-dashboard:
-  image: pantsel/konga:latest
-  container_name: kong-dashboard
-  environment:
-    - NODE_ENV=development
-    - DB_ADAPTER=postgres
-    - DB_HOST=kong-database
-    - DB_USER=kong
-    - DB_DATABASE=kong
-  ports:
-    - "1337:1337"
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - kong-net
+
+  # grpc server
+  grpcbin:
+    image: moul/grpcbin
+    container_name: grpcin
+    ports:
+      - "15002:9000"
+      - "15003:9001"
+    networks:
+      - kong-net
+
+  postgres:
+    image: postgres:self
+    container_name: kong-tests-postgres
+    command: postgres -c "config_file=/etc/postgresql/postgresql.conf"
+    volumes:
+      - "$PWD/postgres/postgres.conf:/etc/postgresql/postgresql.conf"
+    ports:
+      - "5432:5432"
+    environment:
+      - "POSTGRES_USER=kong"
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+    networks:
+      - kong-net
+
+  kong-migration:
+    image: kong:2.0.4
+    depends_on:
+      - postgres
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-tests-postgres
+    networks:
+      - kong-net
+    command: "kong migrations bootstrap"
+
+  # The API Gateway Dashboard
+  kong-dashboard:
+    image: pantsel/konga:latest
+    container_name: kong-dashboard
+    environment:
+      - NODE_ENV=development
+      - DB_ADAPTER=postgres
+      - DB_HOST=kong-tests-postgres
+      - DB_USER=kong
+      - DB_DATABASE=kong
+    ports:
+      - 1337:1337
+    networks:
+      - kong-net
+
+  kong:
+    image: kong:2.0.4
+    container_name: kong
+    restart: on-failure
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-tests-postgres
+      - KONG_PG_DATABASE=kong
+      - KONG_GO_PLUGINS_DIR=off
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 8443:8443
+      - 8444:8444
+    networks:
+      - kong-net
+
+networks:
+  kong-net:
+    driver: bridge
